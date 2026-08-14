@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8월 마음건강 출석부 🌿</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans KR & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Instagram Soft Glow & Card Styling */
+        .insta-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(243, 244, 246, 0.8);
+            box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        }
+        /* Custom range slider thumb */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.4);
+            border: 3px solid #f472b6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        /* Radio button pill transition */
+        .pill-choice {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pill-choice.selected {
+            background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.35);
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+        .emotion-card.selected {
+            background: linear-gradient(135deg, #fde68a 0%, #f43f5e 100%);
+            color: white;
+            box-shadow: 0 6px 16px rgba(244, 63, 94, 0.3);
+            border-color: transparent;
+            transform: scale(1.03);
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        .pulse-subtle {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-rose-50/60 via-slate-50 to-pink-50/40 min-h-screen text-slate-800 pb-16">
+
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-rose-100/60 px-4 py-3.5">
+        <div class="max-w-xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-2xl">🌿</span>
+                <div>
+                    <h1 class="text-base font-bold text-slate-900 leading-tight">마음건강 출석부</h1>
+                    <p class="text-xs text-rose-500 font-medium" id="headerDate">8월의 매일 기록</p>
+                </div>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-rose-100/70 text-rose-600 rounded-full">
+                오늘의 등교 체크
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-xl mx-auto px-4 pt-6">
+
+        <section id="stepPassword" class="insta-card rounded-3xl p-6 sm:p-8 mb-6 transition-all duration-300">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-pink-100 to-rose-200 rounded-2xl mb-3 text-2xl shadow-inner">
+                    🔑
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">오늘의 비밀번호 입력</h2>
+                <p class="text-xs text-slate-500 mt-1">선생님께서 알려주신 비밀번호를 입력해주세요.</p>
+            </div>
+
+            <form id="passcodeForm" onsubmit="handlePasscodeSubmit(event)" class="space-y-4">
+                <div>
+                    <input 
+                        type="password" 
+                        id="inputPasscode" 
+                        placeholder="암호를 입력하세요" 
+                        required
+                        class="w-full px-4 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent text-center text-lg tracking-widest placeholder:text-sm placeholder:tracking-normal placeholder:text-slate-400 transition"
+                    >
+                </div>
+
+                <div id="passcodeError" class="hidden text-xs text-rose-500 text-center font-medium bg-rose-50 py-2.5 rounded-xl border border-rose-100">
+                    ❌ 암호가 올바르지 않습니다. 다시 확인해주세요.
+                </div>
+
+                <button 
+                    type="submit" 
+                    id="btnVerify"
+                    class="w-full bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-rose-200 active:scale-[0.99] transition duration-200 flex items-center justify-center space-x-2"
+                >
+                    <span id="btnVerifyText">확인하기</span>
+                    <span id="btnVerifySpinner" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                </button>
+            </form>
+        </section>
+
+        <section id="stepForm" class="hidden space-y-6">
+            
+            <!-- Student Info Card -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="bg-pink-100 text-pink-600 text-xs px-2.5 py-1 rounded-full font-bold">1단계</span>
+                    <h3 class="text-base font-bold text-slate-900">학생 정보 입력</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Student ID Dropdown (21001 ~ 21033) -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">학번 선택</label>
+                        <select id="studentId" onchange="validateForm()" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-400 focus:outline-none text-sm text-slate-800 transition">
+                            <option value="">학번을 선택하세요</option>
+                        </select>
+                    </div>
+
+                    <!-- Student Name Input -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">이름 입력</label>
+                        <input 
+                            type="text" 
+                            id="studentName" 
+                            placeholder="이름 입력 (예: 홍길동)" 
+                            oninput="validateForm()"
+                            class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-rose-400 focus:outline-none text-sm text-slate-800 transition placeholder:text-slate-400"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mind Temperature Card -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-rose-100 text-rose-600 text-xs px-2.5 py-1 rounded-full font-bold">2단계</span>
+                        <h3 class="text-base font-bold text-slate-900">오늘 마음의 온도</h3>
+                    </div>
+                    <span id="tempValueDisplay" class="text-2xl font-bold font-outfit text-rose-500">36.5℃</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-5">1도(매우 차가움)부터 100도(매우 뜨거움)까지 슬라이더를 조절해주세요.</p>
+
+                <div class="px-2">
+                    <input 
+                        type="range" 
+                        id="tempSlider" 
+                        min="1" 
+                        max="100" 
+                        value="36" 
+                        oninput="updateTempDisplay(this.value)"
+                        class="w-full h-3 bg-gradient-to-r from-blue-200 via-amber-200 to-rose-400 rounded-lg appearance-none cursor-pointer"
+                    >
+                    <div class="flex justify-between text-[11px] text-slate-400 font-medium mt-2">
+                        <span>🧊 1℃ (차가움)</span>
+                        <span>🌱 36.5℃ (편안함)</span>
+                        <span>🔥 100℃ (뜨거움)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body Signal Selection Card -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="bg-purple-100 text-purple-600 text-xs px-2.5 py-1 rounded-full font-bold">3단계</span>
+                    <h3 class="text-base font-bold text-slate-900">신체 신호 체크</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">현재 느껴지는 몸의 반응을 한 가지 선택해주세요.</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="bodySignalGroup">
+                    <button type="button" onclick="selectPill('bodySignal', '두통', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">두통</button>
+                    <button type="button" onclick="selectPill('bodySignal', '소화불량', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">소화불량</button>
+                    <button type="button" onclick="selectPill('bodySignal', '어지러움', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">어지러움</button>
+                    <button type="button" onclick="selectPill('bodySignal', '근육 긴장', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">근육 긴장</button>
+                    <button type="button" onclick="selectPill('bodySignal', '가슴 두근거림', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">가슴 두근거림</button>
+                    <button type="button" onclick="selectPill('bodySignal', '특별한 증상 없음', this)" class="pill-choice border border-slate-200 rounded-2xl py-2.5 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-rose-50/50">특별한 증상 없음</button>
+                </div>
+            </div>
+
+            <!-- Emotion Icon Selection Card -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="bg-amber-100 text-amber-600 text-xs px-2.5 py-1 rounded-full font-bold">4단계</span>
+                    <h3 class="text-base font-bold text-slate-900">대표 감정 아이콘</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">지금 내 마음을 가장 잘 표현하는 감정을 골라주세요.</p>
+
+                <div class="grid grid-cols-3 gap-3" id="emotionGroup">
+                    <button type="button" onclick="selectEmotion('😊 기쁨', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😊</span>
+                        <span class="text-xs font-semibold text-slate-700">기쁨</span>
+                    </button>
+                    <button type="button" onclick="selectEmotion('😢 슬픔', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😢</span>
+                        <span class="text-xs font-semibold text-slate-700">슬픔</span>
+                    </button>
+                    <button type="button" onclick="selectEmotion('😠 화남', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😠</span>
+                        <span class="text-xs font-semibold text-slate-700">화남</span>
+                    </button>
+                    <button type="button" onclick="selectEmotion('😰 불안', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😰</span>
+                        <span class="text-xs font-semibold text-slate-700">불안</span>
+                    </button>
+                    <button type="button" onclick="selectEmotion('😴 피곤', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😴</span>
+                        <span class="text-xs font-semibold text-slate-700">피곤</span>
+                    </button>
+                    <button type="button" onclick="selectEmotion('😐 무덤덤', this)" class="emotion-card border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center bg-white transition hover:border-amber-300">
+                        <span class="text-2xl mb-1">😐</span>
+                        <span class="text-xs font-semibold text-slate-700">무덤덤</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Self-Soothing (Exactly 5 characters) -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-emerald-100 text-emerald-600 text-xs px-2.5 py-1 rounded-full font-bold">5단계</span>
+                        <h3 class="text-base font-bold text-slate-900">나를 다독일 방법</h3>
+                    </div>
+                    <!-- Realtime character counter badge -->
+                    <span id="charCounter" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                        0 / 5글자
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">나에게 전하는 다독임의 한 마디를 <strong class="text-rose-500">공백 제외 정확히 5글자</strong>로 입력해주세요.</p>
+
+                <input 
+                    type="text" 
+                    id="soothingText" 
+                    placeholder="예: 오늘수고했어, 나를사랑하자" 
+                    oninput="checkSoothingCharLength()"
+                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-400 focus:outline-none text-sm text-slate-800 transition"
+                >
+
+                <p id="soothingHint" class="text-[11px] mt-2 font-medium text-rose-500">
+                    ⚠️ 공백을 제외하고 정확히 5글자를 입력해야 [등교하기] 버튼이 활성화됩니다.
+                </p>
+            </div>
+
+            <!-- Self-Love Practice Card -->
+            <div class="insta-card rounded-3xl p-6">
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="bg-indigo-100 text-indigo-600 text-xs px-2.5 py-1 rounded-full font-bold">6단계</span>
+                    <h3 class="text-base font-bold text-slate-900">자기사랑 실천</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">오늘 나를 위해 실천할 행동 한 가지를 골라주세요.</p>
+
+                <div class="grid grid-cols-2 gap-2.5" id="selfLoveGroup">
+                    <button type="button" onclick="selectPill('selfLove', '충분한 수면', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">🌙 충분한 수면</button>
+                    <button type="button" onclick="selectPill('selfLove', '좋아하는 음악 듣기', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">🎵 음악 듣기</button>
+                    <button type="button" onclick="selectPill('selfLove', '산책하기', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">🌳 산책하기</button>
+                    <button type="button" onclick="selectPill('selfLove', '친구와 대화하기', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">💬 친구와 대화</button>
+                    <button type="button" onclick="selectPill('selfLove', '맛있는 음식 먹기', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">🍰 맛있는 음식</button>
+                    <button type="button" onclick="selectPill('selfLove', '혼자만의 시간 갖기', this)" class="pill-choice border border-slate-200 rounded-2xl py-3 px-3 text-xs font-medium text-slate-700 bg-white hover:bg-indigo-50/50">☕ 혼자만의 시간</button>
+                </div>
+            </div>
+
+            <!-- Submit Check-in Button -->
+            <div class="pt-2">
+                <button 
+                    type="button" 
+                    id="btnSubmit" 
+                    disabled 
+                    onclick="submitAttendance()"
+                    class="w-full bg-slate-300 text-white font-bold py-4 rounded-2xl shadow-md cursor-not-allowed transition duration-200 flex items-center justify-center space-x-2 text-base"
+                >
+                    <span id="btnSubmitText">🏫 등교하기 (모든 항목 작성 필요)</span>
+                    <span id="btnSubmitSpinner" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                </button>
+            </div>
+
+        </section>
+
+        <section id="stepSuccess" class="hidden insta-card rounded-3xl p-8 text-center transition-all my-8">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner pulse-subtle">
+                ✨
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">오늘의 등교 완료!</h2>
+            <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+                마음 상태 기록이 출석부에 성공적으로 전달되었습니다.<br>
+                오늘 하루도 나 자신을 소중히 아껴주는 따뜻한 하루 보내세요 💖
+            </p>
+
+            <div class="bg-rose-50/80 rounded-2xl p-4 border border-rose-100/60 mb-6 text-left text-xs space-y-2 text-slate-700">
+                <p><strong>학번/이름:</strong> <span id="summaryStudent"></span></p>
+                <p><strong>마음 온도:</strong> <span id="summaryTemp"></span></p>
+                <p><strong>나의 다독임:</strong> <span id="summarySoothing" class="font-bold text-rose-600"></span></p>
+                <p><strong>오늘의 자기사랑:</strong> <span id="summarySelfLove"></span></p>
+            </div>
+
+            <button 
+                onclick="resetForm()" 
+                class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-6 py-3 rounded-2xl transition shadow-md"
+            >
+                다시 로그인 화면으로 돌아가기
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION & GLOBAL STATE
+        // ==========================================
+        // Google Apps Script 웹 앱 배포 URL을 아래 큰따옴표 안에 입력하세요.
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQZXRE0OsKojdFZQb2qWdty--geP9nMBHAJ9lkBJoPNG5Jah7y_UTAGXcNLg2cNWql/exec"; 
+
+        const formData = {
+            studentId: "",
+            studentName: "",
+            temperature: "36",
+            bodySignal: "",
+            emotion: "",
+            soothing: "",
+            selfLove: ""
+        };
+
+        // Initialize dynamic date and student list on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const date = today.getDate();
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            const dayName = days[today.getDay()];
+            
+            document.getElementById('headerDate').innerText = `${year}년 ${month}월 ${date}일 (${dayName})`;
+
+            // Populate Student ID options (21001 ~ 21033)
+            const idSelect = document.getElementById('studentId');
+            for (let i = 21001; i <= 21033; i++) {
+                const opt = document.createElement('option');
+                opt.value = i.toString();
+                opt.textContent = `${i}번`;
+                idSelect.appendChild(opt);
+            }
+        });
+
+        async function handlePasscodeSubmit(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('inputPasscode').value.trim();
+            const errBox = document.getElementById('passcodeError');
+            const btnVerifyText = document.getElementById('btnVerifyText');
+            const btnVerifySpinner = document.getElementById('btnVerifySpinner');
+
+            if (!inputPass) return;
+
+            errBox.classList.add('hidden');
+            btnVerifyText.textContent = "검증 중...";
+            btnVerifySpinner.classList.remove('hidden');
+
+            try {
+                if (!GAS_WEB_APP_URL) {
+                    throw new Error("웹 앱 URL이 설정되지 않았습니다. Code.gs를 배포한 뒤 GAS_WEB_APP_URL 변수에 URL을 채워주세요.");
+                }
+
+                // Send password directly to backend for verification (no local answer check)
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'verifyPassword',
+                        password: inputPass
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result && result.success) {
+                    unlockStep2();
+                } else {
+                    errBox.classList.remove('hidden');
+                    errBox.textContent = `❌ ${result?.message || '오늘의 비밀번호가 올바르지 않습니다.'}`;
+                }
+            } catch (err) {
+                console.error("Passcode auth error:", err);
+                errBox.classList.remove('hidden');
+                errBox.textContent = `❌ ${err.message || '서버 연결에 실패했습니다.'}`;
+            } finally {
+                btnVerifyText.textContent = "확인하기";
+                btnVerifySpinner.classList.add('hidden');
+            }
+        }
+
+        function unlockStep2() {
+            document.getElementById('stepPassword').classList.add('hidden');
+            document.getElementById('stepForm').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateTempDisplay(val) {
+            formData.temperature = val;
+            const display = document.getElementById('tempValueDisplay');
+            display.textContent = `${val}℃`;
+
+            if (val < 25) {
+                display.className = "text-2xl font-bold font-outfit text-blue-500";
+            } else if (val <= 40) {
+                display.className = "text-2xl font-bold font-outfit text-amber-500";
+            } else {
+                display.className = "text-2xl font-bold font-outfit text-rose-500";
+            }
+            validateForm();
+        }
+
+        function selectPill(category, value, el) {
+            formData[category] = value;
+            const containerId = category === 'bodySignal' ? 'bodySignalGroup' : 'selfLoveGroup';
+            const container = document.getElementById(containerId);
+            
+            container.querySelectorAll('.pill-choice').forEach(btn => btn.classList.remove('selected'));
+            el.classList.add('selected');
+
+            validateForm();
+        }
+
+        function selectEmotion(value, el) {
+            formData.emotion = value;
+            const container = document.getElementById('emotionGroup');
+            
+            container.querySelectorAll('.emotion-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+
+            validateForm();
+        }
+
+        function checkSoothingCharLength() {
+            const rawVal = document.getElementById('soothingText').value;
+            // Exclude whitespace characters for strict 5-character length check
+            const cleanVal = rawVal.replace(/\s/g, '');
+            const charCount = cleanVal.length;
+
+            const counterBadge = document.getElementById('charCounter');
+            const hintText = document.getElementById('soothingHint');
+
+            counterBadge.textContent = `${charCount} / 5글자`;
+
+            if (charCount === 5) {
+                formData.soothing = rawVal.trim();
+                counterBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300";
+                hintText.innerHTML = "✨ <b>정확히 5글자가 입력되었습니다!</b>";
+                hintText.className = "text-[11px] mt-2 font-medium text-emerald-600";
+            } else {
+                formData.soothing = "";
+                counterBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-600 border border-rose-200";
+                hintText.innerHTML = `⚠️ 공백 제외 <b>현재 ${charCount}글자</b>입니다. 정확히 5글자를 맞춰주세요.`;
+                hintText.className = "text-[11px] mt-2 font-medium text-rose-500";
+            }
+
+            validateForm();
+        }
+
+        function validateForm() {
+            formData.studentId = document.getElementById('studentId').value;
+            formData.studentName = document.getElementById('studentName').value.trim();
+
+            const soothingCleanLen = document.getElementById('soothingText').value.replace(/\s/g, '').length;
+
+            const isValid = 
+                formData.studentId !== "" &&
+                formData.studentName !== "" &&
+                formData.bodySignal !== "" &&
+                formData.emotion !== "" &&
+                soothingCleanLen === 5 &&
+                formData.selfLove !== "";
+
+            const submitBtn = document.getElementById('btnSubmit');
+            const btnText = document.getElementById('btnSubmitText');
+
+            if (isValid) {
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full bg-gradient-to-r from-rose-400 via-pink-500 to-rose-500 hover:from-rose-500 hover:to-pink-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-rose-200 active:scale-[0.99] transition duration-200 flex items-center justify-center space-x-2 text-base cursor-pointer";
+                btnText.textContent = "🏫 등교하기 (완료)";
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.className = "w-full bg-slate-200 text-slate-400 font-bold py-4 rounded-2xl cursor-not-allowed transition duration-200 flex items-center justify-center space-x-2 text-base";
+                
+                if (soothingCleanLen !== 5) {
+                    btnText.textContent = "🏫 등교하기 (다독임 글 5글자 확인 필요)";
+                } else {
+                    btnText.textContent = "🏫 등교하기 (미작성 항목이 있습니다)";
+                }
+            }
+        }
+
+        async function submitAttendance() {
+            const btn = document.getElementById('btnSubmit');
+            const btnText = document.getElementById('btnSubmitText');
+            const spinner = document.getElementById('btnSubmitSpinner');
+
+            btn.disabled = true;
+            btnText.textContent = "저장 중...";
+            spinner.classList.remove('hidden');
+
+            try {
+                if (!GAS_WEB_APP_URL) {
+                    alert("구글 앱스 스크립트 배포 URL이 입력되지 않았습니다. index.html 코드 상단의 GAS_WEB_APP_URL을 설정해 주세요.");
+                    return;
+                }
+
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'submitAttendance',
+                        studentId: formData.studentId,
+                        studentName: formData.studentName,
+                        temperature: formData.temperature,
+                        bodySignal: formData.bodySignal,
+                        emotion: formData.emotion,
+                        soothing: formData.soothing,
+                        selfLove: formData.selfLove
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result && result.success) {
+                    showSuccessView();
+                } else {
+                    alert(result?.message || "저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+                }
+            } catch (err) {
+                console.error("Submit error:", err);
+                alert("서버 저장 실패: 배포된 GAS URL 상태를 확인해주세요.");
+            } finally {
+                btnText.textContent = "🏫 등교하기 (완료)";
+                spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+
+        function showSuccessView() {
+            document.getElementById('stepForm').classList.add('hidden');
+            document.getElementById('stepSuccess').classList.remove('hidden');
+
+            document.getElementById('summaryStudent').textContent = `${formData.studentId}번 ${formData.studentName}`;
+            document.getElementById('summaryTemp').textContent = `${formData.temperature}℃`;
+            document.getElementById('summarySoothing').textContent = `"${formData.soothing}"`;
+            document.getElementById('summarySelfLove').textContent = formData.selfLove;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('studentId').value = "";
+            document.getElementById('studentName').value = "";
+            document.getElementById('tempSlider').value = 36;
+            updateTempDisplay(36);
+            document.getElementById('soothingText').value = "";
+            checkSoothingCharLength();
+            
+            document.querySelectorAll('.pill-choice').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.emotion-card').forEach(b => b.classList.remove('selected'));
+
+            formData.bodySignal = "";
+            formData.emotion = "";
+            formData.selfLove = "";
+
+            document.getElementById('stepSuccess').classList.add('hidden');
+            document.getElementById('stepPassword').classList.remove('hidden');
+            document.getElementById('inputPasscode').value = "";
+
+            validateForm();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
